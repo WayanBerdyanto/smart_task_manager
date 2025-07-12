@@ -1,6 +1,7 @@
 import express from 'express'
-import {errorMiddleware} from '../middleware/error-middleware.js';
+import { errorMiddleware } from '../middleware/error-middleware.js';
 import cors from 'cors'
+import { publicRouter } from '../routes/public-api.js';
 
 export const web = express();
 
@@ -9,6 +10,8 @@ web.get("/", (req, res) => {
 });
 
 web.use(express.json());
+
+web.use(publicRouter);
 
 web.use(cors);
 
