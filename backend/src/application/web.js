@@ -2,7 +2,7 @@ import express from 'express'
 import { errorMiddleware } from '../middleware/error-middleware.js';
 import cors from 'cors'
 import { publicRouter } from '../routes/public-api.js';
-import { passport } from '../config/authSSO.js';
+import { passport } from '../config/passport/index.js';
 import session from 'express-session';
 
 export const web = express();

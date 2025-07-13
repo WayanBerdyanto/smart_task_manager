@@ -1,6 +1,6 @@
 import express from "express";
 import userController from "../controllers/userController.js";
-import { passport } from "../config/authSSO.js";
+import { passport } from "../config/passport/index.js";
 
 const publicRouter = new express.Router();
 
