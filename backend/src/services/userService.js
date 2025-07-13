@@ -1,4 +1,4 @@
-import { loginUserValidation, registerUserValidation } from "../validation/userValidation.js";
+import { getUserValidation, loginUserValidation, registerUserValidation, updateUserValidation } from "../validation/userValidation.js";
 import { validation } from "../validation/validation.js";
 import { prismaClient } from "../application/database.js";
 import { ResponseError } from "../error/response-error.js";
@@ -112,8 +112,8 @@ const loginWithGoogle = async (googleProfile) => {
 
     await prismaClient.user.update({
         where: { id: user.id },
-        data: { 
-            token, 
+        data: {
+            token,
             token_expiry: expiry,
             provider: "google"
         }
@@ -157,8 +157,8 @@ const loginWithGithub = async (githubProfile) => {
 
     await prismaClient.user.update({
         where: { id: user.id },
-        data: { 
-            token, 
+        data: {
+            token,
             token_expiry: expiry,
             provider: "github"
         }
@@ -168,9 +168,105 @@ const loginWithGithub = async (githubProfile) => {
 
 }
 
+const getUser = async (email) => {
+    email = validation(getUserValidation, email);
+
+    const user = await prismaClient.user.findUnique({
+        where: {
+            email: email
+        },
+        select: {
+            full_name: true,
+            email: true,
+        }
+    });
+
+    if (!user) {
+        throw new ResponseError(404, 'User Not Found');
+    }
+
+    return user;
+
+}
+
+const updateUser = async (request) => {
+    const user = validation(updateUserValidation, request);
+
+    const existingUser = await prismaClient.user.findUnique({
+        where: {
+            id
+        }
+    });
+
+    if (!existingUser) {
+        throw new ResponseError(404, 'User Not Found');
+    }
+
+    const data = {};
+
+    if (user.full_name) {
+        data.full_name = user.full_name;
+    }
+
+    if (user.email) {
+        data.email = user.email;
+    }
+
+    if (user.password) {
+        data.password = await bcrypt.hash(user.password, 10);
+    }
+
+    if (user.email && user.email !== existingUser.email) {
+        const emailUsed = await prismaClient.user.findUnique({
+            where: { email: user.email }
+        });
+        if (emailUsed) {
+            throw new ResponseError(400, "Update Email Failed");
+        }
+        data.email = user.email;
+    }
+
+    return prismaClient.user.update({
+        where: { id },
+        data,
+        select: {
+            full_name: true,
+            email: true,
+        }
+    });
+}
+
+const logoutUser = async (email) => {
+    email = validation(getUser, email);
+
+    const user = await prismaClient.user.findUnique({
+        where: {
+            email: email
+        }
+    });
+
+    if (!user) {
+        throw new ResponseError(404, 'User Not Found');
+    }
+
+    return prismaClient.user.update({
+        where: { id: user.id },
+        data: {
+            token: null,
+            token_expiry: null
+        },
+        select: {
+            full_name: true,
+        }
+    });
+}
+
 export default {
     register,
     login,
     loginWithGoogle,
-    loginWithGithub
+    loginWithGithub,
+    getUser,
+    updateUser,
+    logoutUser
 }

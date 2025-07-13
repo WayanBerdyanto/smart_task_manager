@@ -2,8 +2,14 @@ import express from 'express'
 import { errorMiddleware } from '../middleware/error-middleware.js';
 import cors from 'cors'
 import { publicRouter } from '../routes/public-api.js';
+import { userRouter } from '../routes/api.js';
 import { passport } from '../config/passport/index.js';
 import session from 'express-session';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const FRONTEND_URL = process.env.FRONTEND_URL;
 
 export const web = express();
 
@@ -26,11 +32,13 @@ web.use(session({
 web.use(passport.initialize());
 web.use(passport.session());
 
-web.use(publicRouter);
+web.use(publicRouter)
+
+web.use(userRouter);
 
 web.use(cors(
     {
-        origin: ["http://localhost:5173", "http://localhost:3001"],
+        origin: [FRONTEND_URL, "http://localhost:3001"],
         credentials: true
     }
 ));

@@ -1,6 +1,11 @@
 import express from "express";
 import userController from "../controllers/userController.js";
 import { passport } from "../config/passport/index.js";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const FRONTEND_URL = process.env.FRONTEND_URL;
 
 const publicRouter = new express.Router();
 
@@ -20,7 +25,7 @@ publicRouter.get('/auth/google/callback',
         //     token,
         //     user: { email, full_name }
         // });
-        res.redirect(`http://localhost:3001/oauth-callback?token=${token}&name=${full_name}&email=${email}`)
+        res.redirect(`${FRONTEND_URL}/oauth-callback?token=${token}&name=${full_name}&email=${email}`)
     }
 );
 
@@ -36,24 +41,9 @@ publicRouter.get('/auth/github/callback',
         //     token,
         //     user: { email, full_name }
         // });
-        res.redirect(`http://localhost:3001/oauth-callback?token=${token}&name=${full_name}&email=${email}`)
+        res.redirect(`${FRONTEND_URL}/oauth-callback?token=${token}&name=${full_name}&email=${email}`)
     }
 );
-
-publicRouter.get('/logout', (req, res) => {
-    req.logout(() => {
-        req.session.destroy();
-        res.redirect('/');
-    });
-});
-
-
-
-function isLoggedIn(req, res, next) {
-    if (req.isAuthenticated()) return next();
-    res.status(401).send('Unauthorized');
-}
-
 
 export {
     publicRouter
