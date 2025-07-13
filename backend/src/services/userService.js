@@ -112,7 +112,11 @@ const loginWithGoogle = async (googleProfile) => {
 
     await prismaClient.user.update({
         where: { id: user.id },
-        data: { token, token_expiry: expiry }
+        data: { 
+            token, 
+            token_expiry: expiry,
+            provider: "google"
+        }
     });
 
     return {
@@ -122,9 +126,51 @@ const loginWithGoogle = async (googleProfile) => {
     };
 }
 
+const loginWithGithub = async (githubProfile) => {
+    const email = githubProfile.emails?.[0]?.value;
+    const full_name = githubProfile.displayName;
+
+    if (!email) throw new ResponseError(400, "GitHub account has no email");
+
+    let user = await prismaClient.user.findUnique({
+        where: { email }
+    });
+
+    if (!user) {
+        user = await prismaClient.user.create({
+            data: {
+                id: uuid(),
+                email,
+                full_name,
+                provider: "github"
+            },
+            select: {
+                id: true,
+                email: true,
+                full_name: true
+            }
+        });
+    }
+
+    const token = uuid();
+    const expiry = new Date(Date.now() + 1000 * 60 * 60 * 3);
+
+    await prismaClient.user.update({
+        where: { id: user.id },
+        data: { 
+            token, 
+            token_expiry: expiry,
+            provider: "github"
+        }
+    });
+
+    return { ...user, token, token_expiry: expiry };
+
+}
 
 export default {
     register,
     login,
-    loginWithGoogle
+    loginWithGoogle,
+    loginWithGithub
 }
