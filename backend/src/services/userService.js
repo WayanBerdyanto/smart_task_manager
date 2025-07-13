@@ -80,8 +80,51 @@ const login = async (request) => {
 }
 
 
+const loginWithGoogle = async (googleProfile) => {
+    const email = googleProfile.emails?.[0]?.value;
+
+    const full_name = googleProfile.displayName;
+
+    if (!email) throw new ResponseError(400, "Google account has no email");
+
+    let user = await prismaClient.user.findUnique({
+        where: { email }
+    });
+
+    if (!user) {
+        user = await prismaClient.user.create({
+            data: {
+                id: uuid(),
+                email,
+                full_name,
+                provider: "google"
+            },
+            select: {
+                id: true,
+                full_name: true,
+                email: true
+            }
+        });
+    }
+
+    const token = uuid().toString();
+    const expiry = new Date(Date.now() + 1000 * 60 * 60 * 3);
+
+    await prismaClient.user.update({
+        where: { id: user.id },
+        data: { token, token_expiry: expiry }
+    });
+
+    return {
+        ...user,
+        token,
+        token_expiry: expiry
+    };
+}
+
 
 export default {
     register,
-    login
+    login,
+    loginWithGoogle
 }

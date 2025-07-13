@@ -1,7 +1,7 @@
-import session from "express-session";
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import dotenv from 'dotenv';
+import userService from "../services/userService.js";
 
 dotenv.config();
 
@@ -21,8 +21,13 @@ passport.use(new GoogleStrategy({
     clientID: GOOGLE_CLIENT_ID,
     clientSecret: GOOGLE_CLIENT_SECRET,
     callbackURL: '/auth/google/callback'
-}, (accessToken, refreshToken, profile, done) => {
-    return done(null, profile);
+}, async (accessToken, refreshToken, profile, done) => {
+    try {
+        const user = await userService.loginWithGoogle(profile);
+        return done(null, user);
+    } catch (err) {
+        return done(err, null);
+    }
 }));
 
 

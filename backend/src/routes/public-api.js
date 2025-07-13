@@ -13,9 +13,13 @@ publicRouter.get('/auth/google',
 );
 
 publicRouter.get('/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: '/' }),
-    (req, res) => {
-        res.redirect('/dashboard');
+    passport.authenticate('google', { session: false }),
+    async (req, res) => {
+        const { token, full_name, email } = req.user;
+        res.json({
+            token,
+            user: { email, full_name }
+        });
     }
 );
 
