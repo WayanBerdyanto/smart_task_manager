@@ -18,7 +18,8 @@ model User {
   id           String    @id @default(uuid())
   full_name    String
   email        String    @unique
-  password     String    @db.VarChar(100)
+  password     String?   @db.VarChar(100)
+  provider     String    @default("local")
   token        String?   @db.VarChar(100)
   token_expiry DateTime?
   tasks        Task[]
