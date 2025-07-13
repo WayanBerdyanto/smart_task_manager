@@ -13,13 +13,14 @@ publicRouter.get('/auth/google',
 );
 
 publicRouter.get('/auth/google/callback',
-    passport.authenticate('google', { session: false }),
+    passport.authenticate('google', { session: false, failureRedirect: '/' }),
     async (req, res) => {
         const { token, full_name, email } = req.user;
-        res.json({
-            token,
-            user: { email, full_name }
-        });
+        // res.json({
+        //     token,
+        //     user: { email, full_name }
+        // });
+        res.redirect(`http://localhost:3001/oauth-callback?token=${token}&name=${full_name}&email=${email}`)
     }
 );
 
@@ -28,13 +29,14 @@ publicRouter.get('/auth/github',
 );
 
 publicRouter.get('/auth/github/callback',
-    passport.authenticate('github', { failureRedirect: '/' }),
+    passport.authenticate('github', { session: false, failureRedirect: '/' }),
     async (req, res) => {
         const { token, full_name, email } = req.user;
-        res.json({
-            token,
-            user: { email, full_name }
-        });
+        // res.json({
+        //     token,
+        //     user: { email, full_name }
+        // });
+        res.redirect(`http://localhost:3001/oauth-callback?token=${token}&name=${full_name}&email=${email}`)
     }
 );
 
