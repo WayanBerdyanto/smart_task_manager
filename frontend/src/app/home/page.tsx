@@ -21,6 +21,8 @@ import {
   Rocket,
 } from "lucide-react"
 import ButtomBanner from "@/components/templates/buttom-banner"
+import Footer from "@/components/templates/footer";
+
 
 export default function HomePage() {
   return (
@@ -360,6 +362,7 @@ export default function HomePage() {
         </div>
       </section>
       <ButtomBanner />
+      <Footer />
     </div>
   )
 }
