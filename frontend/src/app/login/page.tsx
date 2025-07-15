@@ -1,13 +1,15 @@
-import Link from "next/link";
-import { API_URL } from "@/lib/constant/constants";
+// import Link from "next/link";
+// import { API_URL } from "@/lib/constant/constants";
+import LoginForm from "@/components/form/login-form";
 
 export default function Login() {
   return (
-    <div>
-      <h1>Login</h1>
-
-      <Link className="bg-blue-500 text-white p-2 rounded-md" href={`${API_URL}/auth/google`}>Login With Google</Link>
-      <Link className="bg-gray-500 text-white p-2 rounded-md" href={`${API_URL}/auth/github`}>Login With Github</Link>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex flex-col">
+      <div className="flex flex-1 items-center justify-center py-12 px-4">
+        <div className="max-w-md w-full">
+          <LoginForm />
+        </div>
+      </div>
     </div>
   );
 }
